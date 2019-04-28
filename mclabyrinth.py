@@ -101,6 +101,9 @@ class Character(Level):
             print(x, y)
             position_charc = position_charc.move(j, i)
 
+    def random_object_in_map(self):
+
+
 
 
 
@@ -146,6 +149,7 @@ def main():
         character.labyrinth(character.file)
         character.position_character(character.begin)
         position_charc = mc_down.get_rect(topleft=(y, x))
+        mc = mc_down
 
         game = True
 
@@ -158,22 +162,36 @@ def main():
                     pygame.quit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
-                        character.check_direction(30, 0)
+                        mc = mc_down
+                        if y > 410:
+                            character.check_direction(0, 0)
+                        else:
+                            character.check_direction(30, 0)
                     if event.key == pygame.K_UP:
-                        character.check_direction(-30, 0)
+                        mc = mc_up
+                        if y < 30:
+                            character.check_direction(0, 0)
+                        else:
+                            character.check_direction(-30, 0)
                     if event.key == pygame.K_RIGHT:
-                        character.check_direction(0, 30)
+                        mc = mc_right
+                        if x > 410:
+                            character.check_direction(0, 0)
+                        else:
+                            character.check_direction(0, 30)
                     if event.key == pygame.K_LEFT:
-                        character.check_direction(0, -30)
-                        win.blit(mc_left, position_charc)
-
+                        mc = mc_left
+                        if x < 30:
+                            character.check_direction(0, 0)
+                        else:
+                            character.check_direction(0, -30)
 
 
             background = pygame.image.load(os.path.join("img", "background.jpg"))
             win.blit(background, (0, 0))
             character.labyrinth(character.file)
             character.display_labyrinth()
-            win.blit(mc_down, position_charc)
+            win.blit(mc, position_charc)
 
             pygame.display.flip()
 
