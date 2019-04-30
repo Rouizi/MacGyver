@@ -6,6 +6,8 @@ pygame.init()
 win = pygame.display.set_mode((450,450))
 pygame.display.set_caption('McGyver')
 
+
+
 x, y = (0, 0)
 remove_ether = False
 remove_needle = False
@@ -53,7 +55,6 @@ class Level:
         self.needle = neddle
         self.tube = tube
         self.Labyrinth = []
-        #self.file = 'maps\\map1.txt'
 
     def labyrinth(self, file):
         self.Labyrinth = []
@@ -104,8 +105,9 @@ class Character(Level):
 
     def check_direction(self, i, j):
         global position_charc, x ,y
-        if self.Labyrinth[int((y + i) / 30)][int((x + j) / 30)] != 'm':
-            x, y = x + j, y + i
+        if self.Labyrinth[int((x + i) / 30)][int((y + j) / 30)] != 'm':
+            x, y = x + i, y + j
+            print(x, y)
             position_charc = position_charc.move(j, i)
 
     def random_coordinates_of_objects(self):
@@ -143,21 +145,21 @@ class Character(Level):
 
     def remove_objet(self, x_ether, y_ether, x_needle, y_needle, x_tube, y_tube):
         global remove_ether, remove_needle, remove_tube
-        if (x / 30, y / 30) == (y_ether, x_ether):
+        if (x / 30, y / 30) == (x_ether, y_ether):
             remove_ether = True
         if remove_ether:
             background = pygame.image.load(os.path.join("img", "background.jpg"))
             win.blit(background, (0, 0))
             self.Labyrinth[x_ether][y_ether] = '0'
             self.display_labyrinth()
-        if (x / 30, y / 30) == (y_needle, x_needle):
+        if (x / 30, y / 30) == (x_needle, y_needle):
             remove_needle = True
         if remove_needle:
             background = pygame.image.load(os.path.join("img", "background.jpg"))
             win.blit(background, (0, 0))
             self.Labyrinth[x_needle][y_needle] = '0'
             self.display_labyrinth()
-        if (x / 30, y / 30) == (y_tube, x_tube):
+        if (x / 30, y / 30) == (x_tube, y_tube):
             remove_tube = True
         if remove_tube :
             background = pygame.image.load(os.path.join("img", "background.jpg"))
@@ -177,13 +179,14 @@ def main():
         remove_ether = False
         remove_needle = False
         remove_tube = False
+        file = 'maps\\map1.txt'
 
         clock.tick(30)
         main_menu = True
 
         while main_menu:
             win = pygame.display.set_mode((450, 450))
-            file = 'maps\\map1.txt'
+
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -237,25 +240,25 @@ def main():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
                         mc = mc_down
-                        if y > 410:
+                        if x > 410:
                             character.check_direction(0, 0)
                         else:
                             character.check_direction(30, 0)
                     if event.key == pygame.K_UP:
                         mc = mc_up
-                        if y < 30:
+                        if x < 30:
                             character.check_direction(0, 0)
                         else:
                             character.check_direction(-30, 0)
                     if event.key == pygame.K_RIGHT:
                         mc = mc_right
-                        if x > 410:
+                        if y > 410:
                             character.check_direction(0, 0)
                         else:
                             character.check_direction(0, 30)
                     if event.key == pygame.K_LEFT:
                         mc = mc_left
-                        if x < 30:
+                        if y < 30:
                             character.check_direction(0, 0)
                         else:
                             character.check_direction(0, -30)
@@ -293,7 +296,6 @@ def main():
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
                             gameover = False
-                            end_game = True
 
                 win = pygame.display.set_mode((450, 450))
                 win.blit(game_over, (0, 0))
@@ -310,8 +312,6 @@ def main():
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
                             victory = False
-                            gameover = False
-                            end_game = True
 
                 win = pygame.display.set_mode((450, 450))
                 win.blit(you_win, (0, 0))
