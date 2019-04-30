@@ -23,6 +23,8 @@ needle = pygame.image.load(os.path.join("img", "needle.png"))
 wall = pygame.image.load(os.path.join("img", "wall.png"))
 choice_level = pygame.image.load(os.path.join("img", "choice_level.png")).convert_alpha()
 text = pygame.image.load(os.path.join("img", "text.png")).convert_alpha()
+game_over = pygame.transform.scale(pygame.image.load(os.path.join("img", "game_over.jpg")), (450,450))
+you_win = pygame.transform.scale(pygame.image.load(os.path.join("img", "you_win.png")), (450,450))
 
 position_charc = mc_down.get_rect(topleft=(y, x))
 
@@ -40,8 +42,6 @@ for img in liste_img:
 pygame.display.flip()
 
 
-
-
 class Level:
     def __init__(self, rect, index, begin, guardian, wall, ether, neddle, tube):
         self.rect = rect
@@ -53,7 +53,7 @@ class Level:
         self.needle = neddle
         self.tube = tube
         self.Labyrinth = []
-        self.file = 'maps\\map1.txt'
+        #self.file = 'maps\\map1.txt'
 
     def labyrinth(self, file):
         self.Labyrinth = []
@@ -92,6 +92,7 @@ class Character(Level):
 
     def __init__(self, rect, index, begin, guardian, wall, ether, neddle, tube):
         super().__init__(rect, index, begin, guardian, wall, ether, neddle, tube)
+        self.winner = False
 
     def position_character(self, wanted):
         global x, y
@@ -104,7 +105,7 @@ class Character(Level):
     def check_direction(self, i, j):
         global position_charc, x ,y
         if self.Labyrinth[int((y + i) / 30)][int((x + j) / 30)] != 'm':
-            x , y = x + j, y + i
+            x, y = x + j, y + i
             position_charc = position_charc.move(j, i)
 
     def random_coordinates_of_objects(self):
@@ -134,46 +135,35 @@ class Character(Level):
         else:
             return self.random_coordinates_of_objects()
 
-    def put_reference_of_objects_in_file(self, x_ether, y_ether, x_needle, y_needle, x_tube, y_tube):
-        self.Labyrinth[x_ether][y_ether] = self.ether #we do that to know the location of ether in our file
-        self.Labyrinth[x_needle][y_needle] = self.needle# same thing with tube and needle
-        self.Labyrinth[x_tube][y_tube] = self.tube
-
-    """def check_if_object_in_map(self):
+    def object_in_map(self):
         for i, line in enumerate(self.Labyrinth):
             for c, column in enumerate(line):
-                if column == 'e' or column == 't' or column == 'n':
+                if column == self.ether or column == self.tube or column == self.needle:
                     return True
-        return False"""
 
     def remove_objet(self, x_ether, y_ether, x_needle, y_needle, x_tube, y_tube):
         global remove_ether, remove_needle, remove_tube
-        if (x/30, y/30) == (y_ether, x_ether):
+        if (x / 30, y / 30) == (y_ether, x_ether):
             remove_ether = True
         if remove_ether:
-            print((x / 30, y / 30) == (y_ether, x_ether))
             background = pygame.image.load(os.path.join("img", "background.jpg"))
             win.blit(background, (0, 0))
             self.Labyrinth[x_ether][y_ether] = '0'
             self.display_labyrinth()
-            print(self.Labyrinth[x_ether][y_ether])
-        if (x/30, y/30) == (y_needle, x_needle):
+        if (x / 30, y / 30) == (y_needle, x_needle):
             remove_needle = True
         if remove_needle:
             background = pygame.image.load(os.path.join("img", "background.jpg"))
             win.blit(background, (0, 0))
             self.Labyrinth[x_needle][y_needle] = '0'
             self.display_labyrinth()
-        if (x/30, y/30) == (y_tube, x_tube):
+        if (x / 30, y / 30) == (y_tube, x_tube):
             remove_tube = True
         if remove_tube :
             background = pygame.image.load(os.path.join("img", "background.jpg"))
             win.blit(background, (0, 0))
             self.Labyrinth[x_tube][y_tube] = '0'
             self.display_labyrinth()
-
-
-
 
 
 def main():
@@ -183,12 +173,17 @@ def main():
     current_part = True
 
     while current_part:
-        global position_charc
+        global position_charc, remove_ether, remove_needle, remove_tube
+        remove_ether = False
+        remove_needle = False
+        remove_tube = False
 
         clock.tick(30)
         main_menu = True
 
         while main_menu:
+            win = pygame.display.set_mode((450, 450))
+            file = 'maps\\map1.txt'
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -197,11 +192,16 @@ def main():
                     pygame.quit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_F1:
+                        file = 'maps\\map1.txt'
                         main_menu = False
+                    if event.key == pygame.K_F2:
+                        file = 'maps\\map2.txt'
+                        main_menu = False
+
             character = Character(20, 3.75, 'd', 'g', 'm', 'e', 'n', 't')
             background = pygame.transform.scale(pygame.image.load(os.path.join("img", "background.jpg")), (300,300))
             win.blit(background, (75, 75))
-            character.labyrinth(character.file)
+            character.labyrinth(file)
             character.display_labyrinth()
             win.blit(small_img[3], (115, 95))
             win.blit(choice_level, (150, 390))
@@ -214,24 +214,26 @@ def main():
             pygame.display.flip()
 
         character = Character(30, 0, 'd', 'g', 'm', 'e', 'n', 't')
-        character.labyrinth(character.file)
+        character.labyrinth(file)
         character.position_character(character.begin)
         position_charc = mc_down.get_rect(topleft=(y, x))
         mc = mc_down
         x_ether, y_ether, x_needle, y_needle, x_tube, y_tube = character.random_coordinates_of_objects()
 
-        game = True
+        end_game = False
 
-        while game:
+        while not end_game:
+            gameover = False
+            victory = False
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    game = False
+                    end_game = True
                     quit()
                     pygame.quit()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_F1:
-                        game = False
+                    if event.key == pygame.K_ESCAPE:
+                        end_game = True
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
                         mc = mc_down
@@ -260,21 +262,60 @@ def main():
 
             background = pygame.image.load(os.path.join("img", "background.jpg"))
             win.blit(background, (0, 0))
-            character.labyrinth(character.file)
+            character.labyrinth(file)
             character.display_labyrinth()
             win.blit(ether, (y_ether * 30, x_ether * 30))
             win.blit(needle, (y_needle * 30, x_needle * 30))
             win.blit(tube, (y_tube * 30, x_tube * 30))
 
-            #background = pygame.transform.scale(pygame.image.load(os.path.join("img", "background.jpg")), (30, 30))
-            #win.blit(background, (y1 * 30, x1 * 30))
-            character.put_reference_of_objects_in_file(x_ether, y_ether, x_needle, y_needle, x_tube, y_tube)
+
+            character.Labyrinth[x_ether][y_ether] = character.ether# we do that to know the location of ether
+            character.Labyrinth[x_needle][y_needle] = character.needle#in our file, same thing with tube and needle
+            character.Labyrinth[x_tube][y_tube] = character.tube
             character.remove_objet(x_ether, y_ether, x_needle, y_needle, x_tube, y_tube)
             win.blit(mc, position_charc)
-
-
-
             pygame.display.flip()
+            if (character.object_in_map() and
+               character.Labyrinth[int(x / 30)][int(y / 30)] == character.guardian):
+                end_game = True
+                gameover = True
+            if (not character.object_in_map() and
+               character.Labyrinth[int(x / 30)][int(y / 30)] == character.guardian):
+                    end_game = True
+                    victory = True
+
+            while gameover:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        gameover = False
+                        quit()
+                        pygame.quit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            gameover = False
+                            end_game = True
+
+                win = pygame.display.set_mode((450, 450))
+                win.blit(game_over, (0, 0))
+                pygame.display.flip()
+
+                pygame.display.flip()
+
+            while victory:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        victory = False
+                        quit()
+                        pygame.quit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            victory = False
+                            gameover = False
+                            end_game = True
+
+                win = pygame.display.set_mode((450, 450))
+                win.blit(you_win, (0, 0))
+                pygame.display.flip()
 
 
 main()
