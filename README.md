@@ -4,7 +4,7 @@ MacGyver must escape from a labyrinth whose exit is blocked by a guard. MacGyver
 find various elements, randomly placed in the labyrinth, to make a syringe that will serve to asleep the guard. Without it, MacGyver 
 is not strong enough to defeat him and dies like a hero but dies anyway ...
 
-##Features
+## Features
 - Two level. The structure (departure, location of the walls, arrival), should be saved in a file to easily modify it if necessary.
 - MacGyver will be controlled by the directional keys on the keyboard.
 - The objects will be randomly distributed in the maze and will change locations if the user closes the game and raises it.
