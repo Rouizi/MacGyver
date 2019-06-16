@@ -12,5 +12,5 @@ is not strong enough to defeat him and dies like a hero but dies anyway ...
 - MacGyver will have to move from square to square, with 15 squares along the window's length
 - It will retrieve an object simply by moving on it.
 - The program stops only if MacGyver has recovered all objects and found the exit from the maze. 
-- If he stupid enough to comes in front of the the guard without all the objects, he dies (according to the evolution theory).
+ If he stupid enough to comes in front of the the guard without all the objects, he dies (according to the evolution theory).
 - The program will be standalone, i. e. it can be run on any computer.
